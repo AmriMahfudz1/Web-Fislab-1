@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login FISLAB I</title>
+    <style>
+        /* CSS (Kode untuk Tampilan) */
+        :root {
+            --primary-gold: #cfa330;
+            --dark-bg: #1a1a1a;
+            --text-color: #000000;
+        }
+
+
+
+        body {
+            margin: 0;
+            font-family: 'Times New Roman', serif;
+            background-color: var(--primary-gold);
+            display: flex;
+            justify-content: center; /* Menengahkan horizontal */
+            align-items: center;   /* Menengahkan vertikal */
+            height: 100vh;
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        /* Loading Screen Styles */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-gold);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: var(--text-color);
+        }
+
+        .loading-screen.active {
+            display: flex;
+        }
+
+        .loading-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(0, 0, 0, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(0, 0, 0, 0.03) 0%, transparent 50%);
+            background-size: 300px 300px, 200px 200px;
+            animation: backgroundFloat 15s ease-in-out infinite;
+        }
+
+        @keyframes backgroundFloat {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-10px) scale(1.02); }
+        }
+
+        .loading-content {
+            text-align: center;
+            z-index: 2;
+            max-width: 500px;
+            padding: 20px;
+            margin-top: -100px;
+        }
+
+        .loading-title {
+            font-size: 8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-color);
+            font-family: 'Times New Roman', serif;
+            letter-spacing: 2px;
+        }
+
+        .loading-subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 50px;
+            opacity: 0.7;
+            font-weight: 500;
+        }
+
+        .progress-container {
+            width: 100%;
+            max-width: 350px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            padding: 2px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .progress-bar {
+            height: 16px;
+            background: var(--text-color);
+            border-radius: 18px;
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .progress-text {
+            font-size: 1rem;
+            margin-top: 12px;
+            font-weight: 600;
+            opacity: 0.8;
+        }
+
+        .tips-container {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: var(--text-color);
+            color: var(--primary-gold);
+            border-radius: 12px;
+            padding: 18px;
+            max-width: 280px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            animation: tipsSlideIn 0.6s ease-out;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes tipsSlideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .tips-title {
+            color: var(--primary-gold);
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tips-content {
+            color: var(--primary-gold);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            opacity: 0.9;
+        }
+
+        .loading-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: var(--text-color);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: particleFloat 8s infinite linear;
+        }
+
+        .particle:nth-child(1) { left: 15%; animation-delay: 0s; }
+        .particle:nth-child(2) { left: 25%; animation-delay: 1.5s; }
+        .particle:nth-child(3) { left: 35%; animation-delay: 3s; }
+        .particle:nth-child(4) { left: 45%; animation-delay: 4.5s; }
+        .particle:nth-child(5) { left: 55%; animation-delay: 6s; }
+        .particle:nth-child(6) { left: 65%; animation-delay: 7.5s; }
+        .particle:nth-child(7) { left: 75%; animation-delay: 1s; }
+        .particle:nth-child(8) { left: 85%; animation-delay: 2.5s; }
+
+        @keyframes particleFloat {
+            0% { top: 100%; opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { top: -10px; opacity: 0; }
+        }
+
+        .login-container {
+            text-align: center;
+            width: 100%;
+            max-width: 320px;
+            /* Properti height, margin-top, dan margin-bottom dihapus agar penempatan terpusat berfungsi */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* Tambahkan transisi untuk animasi perpindahan */
+            transition: transform 0.6s ease-in-out;
+        }
+
+        /* State saat form terlihat - container bergeser ke atas */
+        .login-container.form-visible {
+            transform: translateY(-100px); /* Geser ke atas menggunakan transform */
+        }
+
+        .logo-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: -300px;
+        }
+
+        .logo-symbol {
+            font-size: 8rem;
+            font-weight: 500;
+            line-height: 1;
+            margin-bottom: -40px;
+        }
+
+        .logo-text {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .login-btn {
+            background-color: var(--text-color);
+            color: var(--primary-gold);
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            font-family: 'Times New Roman', serif;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease, text-shadow 0.2s ease, opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .login-btn:hover {
+            transform: scale(1.06);
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.35);
+            text-shadow: 0 0 2px currentColor, 0 0 4px currentColor;
+        }
+
+        /* Tombol awal akan disembunyikan saat form muncul */
+        .login-btn.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Kontainer untuk form yang awalnya disembunyikan */
+        #login-form-wrapper {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out 0.2s, transform 0.6s ease-out 0.2s; /* Tambah delay */
+            width: 100%;
+            margin-top: 70px;
+        }
+
+        /* State saat form terlihat */
+        #login-form-wrapper.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(200px);
+        }
+
+        .form-fields {
+            background-color: var(--text-color);
+            padding: 25px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .input-group label {
+            display: block;
+            color: var(--primary-gold);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            background-color: var(--primary-gold);
+            color: var(--text-color);
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .input-group input:focus {
+            outline: 2px solid #ffffff;
+        }
+        
+        /* Header pojok kiri atas */
+        .top-left-header {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-color);
+            z-index: 1000;
+        }
+        .top-left-header .header-logo {
+            font-size: 1.8rem;
+            line-height: 1;
+        }
+        .top-left-header .header-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* Kotak border garis hitam di bagian atas (header box) */
+        .top-border-box {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px; /* Ubah tinggi sesuai kebutuhan */
+            border: 0; /* Hapus semua sisi */
+            border-bottom: 1px solid #000000; /* Hanya garis bawah */
+            box-sizing: border-box;
+            background-color: var(--primary-gold);
+            pointer-events: none; /* Tidak menghalangi klik elemen di bawahnya */
+            z-index: 900; /* Di bawah header agar tidak menutupi */
+        }
+
+        /* Tombol night mode (pojok kanan atas) */
+        .mode-toggle {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--text-color);
+            color: var(--primary-gold);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            font-family: 'Times New Roman', serif;
+            cursor: pointer;
+            z-index: 1200;
+            transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        .mode-toggle:hover { transform: scale(1.06); }
+
+        .mode-toggle .icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+            transition: transform 0.3s ease;
+        }
+
+        .mode-toggle:hover .icon {
+            transform: rotate(15deg);
+        }
+
+        /* Dark mode overrides */
+        body.dark { background-color: var(--dark-bg); color: var(--primary-gold); }
+        body.dark .top-left-header { color: var(--primary-gold); }
+        body.dark .form-fields { background-color: #2a2a2a; }
+        body.dark .input-group input { background-color: #3a3a3a; color: #ffffff; }
+        body.dark .login-btn { background-color: var(--primary-gold); color: #1a1a1a; }
+        body.dark .login-btn:hover { text-shadow: 0 0 2px var(--primary-gold), 0 0 4px var(--primary-gold); }
+        body.dark .top-border-box { border-bottom-color: var(--primary-gold); background-color: var(--dark-bg); }
+        body.dark .mode-toggle { background-color: var(--primary-gold); color: #1a1a1a; }
+
+        /* Dark mode overrides untuk loading screen */
+        body.dark .loading-screen { 
+            background: var(--dark-bg); 
+            color: var(--primary-gold); 
+        }
+        body.dark .loading-title { 
+            color: var(--primary-gold); 
+        }
+        body.dark .progress-container { 
+            background: rgba(255, 255, 255, 0.1); 
+            border-color: rgba(255, 255, 255, 0.2); 
+        }
+        body.dark .progress-bar { 
+            background: var(--primary-gold); 
+        }
+        body.dark .tips-container { 
+            background: var(--primary-gold); 
+            color: var(--dark-bg); 
+            border-color: rgba(255, 255, 255, 0.2); 
+        }
+        body.dark .tips-title { 
+            color: var(--dark-bg); 
+        }
+        body.dark .tips-content { 
+            color: var(--dark-bg); 
+        }
+        body.dark .particle { 
+            background: var(--primary-gold); 
+        }
+    </style>
+</head>
+<body>
+
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading-screen">
+        <div class="loading-background"></div>
+        <div class="loading-particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+        <div class="loading-content">
+            <h1 class="loading-title">Φ</h1>
+            <p class="loading-subtitle">Memuat sistem pembelajaran...</p>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="progress-text" id="progress-text">0%</div>
+        </div>
+        <div class="tips-container" id="tips-container">
+            <div class="tips-title">
+                <span>💡</span>
+                <span>Tips</span>
+            </div>
+            <div class="tips-content" id="tips-content">Memuat tips...</div>
+        </div>
+    </div>
+
+    <header class="top-left-header" aria-label="Brand header">
+        <span class="header-logo">Φ</span>
+        <span class="header-text">FISLAB I</span>
+    </header>
+    <div class="top-border-box" aria-hidden="true"></div>
+    <button id="mode-toggle" class="mode-toggle" type="button" aria-label="Toggle night mode">
+        <svg class="icon sun-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+        <svg class="icon moon-icon" viewBox="0 0 24 24" aria-hidden="true" style="display: none;">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+    </button>
+
+    <div class="login-container">
+        <div class="logo-wrapper">
+            <div class="logo-symbol">Φ</div>
+            <h1 class="logo-text">FISLAB I</h1>
+            <button id="initial-login-btn" class="login-btn">Login</button>
+        </div>
+
+        <div id="login-form-wrapper">
+            <form id="login-form" action="#" method="POST">
+                <div class="form-fields"> 
+                    <div class="input-group">
+                        <label for="nrp">NRP</label>
+                        <input type="text" id="nrp" name="nrp" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="password">Kata Sandi</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                </div>
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+        </div>
+
+    </div>
+
+    <script>
+        const initialLoginBtn = document.getElementById('initial-login-btn');
+        const loginFormWrapper = document.getElementById('login-form-wrapper');
+        const loginContainer = document.querySelector('.login-container');
+        const modeToggleBtn = document.getElementById('mode-toggle');
+        const loginForm = document.getElementById('login-form');
+        const loadingScreen = document.getElementById('loading-screen');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const tipsContent = document.getElementById('tips-content');
+
+        // Array tips yang akan berganti
+        const tips = [
+            "Gunakan fitur dark mode untuk pengalaman belajar yang nyaman di malam hari",
+            "Simpan progress belajar Anda secara berkala",
+            "Jangan ragu untuk bertanya jika ada yang kurang jelas",
+            "Latihan rutin akan meningkatkan pemahaman Anda",
+            "Gunakan fitur bookmark untuk materi yang penting",
+            "Bergabunglah dengan forum diskusi untuk berbagi pengetahuan",
+            "Jadwalkan waktu belajar yang konsisten setiap hari",
+            "Gunakan metode pomodoro untuk fokus belajar yang optimal"
+        ];
+
+        let currentTipIndex = 0;
+        let tipInterval;
+
+        // Fungsi untuk menampilkan loading screen
+        function showLoadingScreen() {
+            loadingScreen.classList.add('active');
+            
+            let progress = 0;
+            const duration = 10000; // 10 detik
+            const interval = 100; // Update setiap 100ms
+            
+            const progressInterval = setInterval(() => {
+                progress += (100 * interval) / duration;
+                if (progress > 100) progress = 100;
+                
+                progressBar.style.width = progress + '%';
+                progressText.textContent = Math.round(progress) + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    setTimeout(() => {
+                        loadingScreen.classList.remove('active');
+                        // Redirect ke home.html setelah loading selesai
+                        window.location.href = 'home.html';
+                    }, 500);
+                }
+            }, interval);
+        }
+
+        // Fungsi untuk mengganti tips
+        function changeTip() {
+            tipsContent.textContent = tips[currentTipIndex];
+            currentTipIndex = (currentTipIndex + 1) % tips.length;
+        }
+
+        // Mulai mengganti tips setiap 2 detik
+        function startTipRotation() {
+            changeTip(); // Tampilkan tip pertama
+            tipInterval = setInterval(changeTip, 2000);
+        }
+
+        // Hentikan rotasi tips
+        function stopTipRotation() {
+            if (tipInterval) {
+                clearInterval(tipInterval);
+            }
+        }
+
+        initialLoginBtn.addEventListener('click', () => {
+            // Sembunyikan tombol login awal
+            initialLoginBtn.classList.add('hidden');
+            
+            // Geser seluruh container ke atas
+            loginContainer.classList.add('form-visible');
+
+            // Tampilkan form login
+            loginFormWrapper.classList.add('visible');
+        });
+
+        // Redirect ke home saat tombol login (kedua) ditekan
+        loginForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            
+            // Ambil NRP dari form
+            const nrp = document.getElementById('nrp').value;
+            
+            // Simpan NRP ke localStorage untuk digunakan di halaman lain
+            localStorage.setItem('fislab-nrp', nrp);
+            
+            // Mulai rotasi tips dan tampilkan loading screen
+            startTipRotation();
+            showLoadingScreen();
+        });
+
+        // Night mode: restore preference
+        const prefersDark = localStorage.getItem('fislab-theme') === 'dark';
+        const sunIcon = document.querySelector('.sun-icon');
+        const moonIcon = document.querySelector('.moon-icon');
+        
+        if (prefersDark) {
+            document.body.classList.add('dark');
+            sunIcon.style.display = 'none';
+            moonIcon.style.display = 'block';
+        } else {
+            sunIcon.style.display = 'block';
+            moonIcon.style.display = 'none';
+        }
+
+        // Night mode toggle handler
+        modeToggleBtn.addEventListener('click', () => {
+            const willBeDark = !document.body.classList.contains('dark');
+            document.body.classList.toggle('dark');
+            localStorage.setItem('fislab-theme', willBeDark ? 'dark' : 'light');
+            
+            // Toggle icon display
+            if (willBeDark) {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            } else {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            }
+        });
+
+
+    </script>
+
+    <!-- Audio Control Script -->
+    <script src="audio-control.js"></script>
+</body>
+</html>

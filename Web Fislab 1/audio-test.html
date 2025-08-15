@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Test - FISLAB</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #cfa330;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        
+        .test-section h3 {
+            color: #333;
+            margin-top: 0;
+        }
+        
+        .navigation-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .nav-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #cfa330;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .nav-link:hover {
+            background: #b89428;
+        }
+        
+        .status {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .control-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            transition: background 0.3s;
+        }
+        
+        .control-btn:hover {
+            background: #0056b3;
+        }
+        
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .volume-slider {
+            width: 150px;
+        }
+        
+        .info {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .info h4 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Audio Test - FISLAB</h1>
+        
+        <div class="info">
+            <h4>ℹ️ Cara Penggunaan:</h4>
+            <p>1. Klik tombol play untuk memulai musik</p>
+            <p>2. Navigasi ke halaman lain - musik akan terus berputar</p>
+            <p>3. Kembali ke halaman ini - musik akan melanjutkan dari posisi terakhir</p>
+            <p>4. Gunakan kontrol volume untuk mengatur suara</p>
+        </div>
+        
+        <div class="test-section">
+            <h3>🎮 Kontrol Audio</h3>
+            <div class="controls">
+                <button class="control-btn" onclick="playAudio()">▶️ Play</button>
+                <button class="control-btn" onclick="pauseAudio()">⏸️ Pause</button>
+                <button class="control-btn" onclick="stopAudio()">⏹️ Stop</button>
+                <button class="control-btn" onclick="restartAudio()">🔄 Restart</button>
+            </div>
+            
+            <div class="volume-control">
+                <label for="volume">Volume:</label>
+                <input type="range" id="volume" class="volume-slider" min="0" max="1" step="0.1" value="0.7" onchange="changeVolume(this.value)">
+                <span id="volume-value">0.7</span>
+            </div>
+            
+            <div class="status" id="audio-status">
+                Status: Audio siap
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🧭 Navigasi Halaman</h3>
+            <p>Klik link di bawah untuk menguji musik yang terus berputar saat berpindah halaman:</p>
+            
+            <div class="navigation-links">
+                <a href="home.html" class="nav-link">🏠 Home</a>
+                <a href="modul.html" class="nav-link">📚 Modul</a>
+                <a href="jadwal.html" class="nav-link">📅 Jadwal</a>
+                <a href="kontak.html" class="nav-link">📞 Kontak</a>
+                <a href="nilai.html" class="nav-link">📊 Nilai</a>
+                <a href="penilaian.html" class="nav-link">✍️ Penilaian</a>
+            </div>
+            
+            <p><strong>Catatan:</strong> Musik akan terus berputar dan melanjutkan dari posisi terakhir saat Anda kembali ke halaman ini.</p>
+        </div>
+        
+        <div class="test-section">
+            <h3>📊 Informasi Audio</h3>
+            <div id="audio-info">
+                <p>Durasi: <span id="duration">-</span></p>
+                <p>Posisi Saat Ini: <span id="current-time">-</span></p>
+                <p>Status: <span id="playing-status">-</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include the audio manager -->
+    <script src="audio-manager.js"></script>
+    
+    <script>
+        // Audio control functions
+        function playAudio() {
+            if (window.fislabAudio) {
+                window.fislabAudio.play();
+                updateStatus('Memutar musik...');
+            }
+        }
+        
+        function pauseAudio() {
+            if (window.fislabAudio) {
+                window.fislabAudio.pause();
+                updateStatus('Musik di-pause');
+            }
+        }
+        
+        function stopAudio() {
+            if (window.fislabAudio) {
+                window.fislabAudio.pause();
+                window.fislabAudio.seekTo(0);
+                updateStatus('Musik dihentikan');
+            }
+        }
+        
+        function restartAudio() {
+            if (window.fislabAudio) {
+                window.fislabAudio.seekTo(0);
+                window.fislabAudio.play();
+                updateStatus('Musik di-restart');
+            }
+        }
+        
+        function changeVolume(value) {
+            if (window.fislabAudio) {
+                window.fislabAudio.setVolume(parseFloat(value));
+                document.getElementById('volume-value').textContent = value;
+                updateStatus(`Volume diubah ke ${value}`);
+            }
+        }
+        
+        function updateStatus(message) {
+            document.getElementById('audio-status').textContent = `Status: ${message}`;
+        }
+        
+        // Update audio information
+        function updateAudioInfo() {
+            if (window.fislabAudio && window.fislabAudio.isReady()) {
+                const duration = window.fislabAudio.getDuration();
+                const currentTime = window.fislabAudio.getCurrentTime();
+                const isPlaying = window.fislabAudio.getPlayingState();
+                
+                document.getElementById('duration').textContent = formatTime(duration);
+                document.getElementById('current-time').textContent = formatTime(currentTime);
+                document.getElementById('playing-status').textContent = isPlaying ? 'Memutar' : 'Berhenti';
+            }
+        }
+        
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '-';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // Update info every second
+        setInterval(updateAudioInfo, 1000);
+        
+        // Initial update
+        setTimeout(updateAudioInfo, 2000);
+        
+        // Show welcome message
+        window.addEventListener('load', () => {
+            updateStatus('Halaman dimuat. Klik Play untuk memulai musik!');
+        });
+    </script>
+</body>
+</html>
